@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Name Predictor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        .car-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #343a40;
+            margin-bottom: 30px;
+        }
+        .form-group label {
+            font-weight: 600;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .description {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+        }
+        .description h2 {
+            font-size: 1.6rem;
+            color: #343a40;
+        }
+        .description p {
+            margin: 0;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="car-image">
+            <img src="{{ url_for('static', filename='car.png') }}" alt="Car Image" class="img-fluid rounded">
+        </div>
+        <h1 class="text-center">Car Name Predictor</h1>
+        <form id="carForm">
+            <div class="form-group">
+                <label for="year">Year:</label>
+                <input type="number" id="year" name="year" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="selling_price">Selling Price (INR):</label>
+                <input type="number" id="selling_price" name="selling_price" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="km_driven">Kilometers Driven:</label>
+                <input type="number" id="km_driven" name="km_driven" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="fuel">Fuel Type:</label>
+                <select id="fuel" name="fuel" class="form-control">
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="CNG">CNG</option>
+                    <option value="LPG">LPG</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="seller_type">Seller Type:</label>
+                <select id="seller_type" name="seller_type" class="form-control">
+                    <option value="Individual">Individual</option>
+                    <option value="Dealer">Dealer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transmission">Transmission:</label>
+                <select id="transmission" name="transmission" class="form-control">
+                    <option value="Manual">Manual</option>
+                    <option value="Automatic">Automatic</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Predict Car Name</button>
+        </form>
+        <div class="result" id="result"></div>
+        <div class="description">
+            <h2>About Us</h2>
+            <p>Welcome to our Car Name Predictor! We use advanced machine learning algorithms to predict the name of a car based on its specifications. Simply fill in the details and get an instant prediction.</p>
+        </div>
+    </div>
+    <script>
+        document.getElementById("carForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const data = {
+                year: document.getElementById("year").value,
+                selling_price: document.getElementById("selling_price").value,
+                km_driven: document.getElementById("km_driven").value,
+                fuel: document.getElementById("fuel").value,
+                seller_type: document.getElementById("seller_type").value,
+                transmission: document.getElementById("transmission").value
+            };
+
+            fetch("/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById("result").innerText = "Predicted Car Name: " + result.predicted_car_name;
+            })
+            .catch(error => {
+                document.getElementById("result").innerText = "Error predicting car name.";
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
